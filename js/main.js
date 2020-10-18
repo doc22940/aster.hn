@@ -139,7 +139,6 @@ const getApiCall = (query) => {
       query,
     },
   }).then((result) => {
-    console.log(result.data);
     return result.data;
   });
 };
@@ -401,29 +400,34 @@ var main = (function () {
     const githubButton = document.createElement("i");
     githubButton.setAttribute("data-feather", "github");
     Terminal.makeElementDisappear(githubButton);
-    element.onclick = (file, event) => {
-      window.open(`https://github.com/${github}`);
-    };
+
     const githubMenuButton = document.createElement("button");
     githubMenuButton.appendChild(githubButton);
+    githubMenuButton.onclick = (file, event) => {
+      console.log("opening github", github);
+      window.open(`https://github.com/${github}`);
+    };
     const linkedinButton = document.createElement("i");
     linkedinButton.setAttribute("data-feather", "linkedin");
     Terminal.makeElementDisappear(linkedinButton);
-    element.onclick = (file, event) => {
-      window.open(`https://linkedin.com/in/${linkedin}`);
-    };
     const linkedinMenuButton = document.createElement("button");
     linkedinMenuButton.appendChild(linkedinButton);
+    linkedinMenuButton.onclick = (file, event) => {
+      console.log("opening linkedin", linkedin);
+      window.open(`https://linkedin.com/in/${linkedin}`);
+    };
+
     const mailButton = document.createElement("i");
     mailButton.setAttribute("data-feather", "mail");
     Terminal.makeElementDisappear(mailButton);
-    element.onclick = (file, event) => {
-      this.handleSidenav(event);
-      this.cmdLine.value = `To reach out, feel free to send an email to ${contact}`;
-      this.handleCmd();
-    };
     const mailMenuButton = document.createElement("button");
     mailMenuButton.appendChild(mailButton);
+
+    mailMenuButton.onclick = (event) => {
+      this.handleSidenav(event);
+      this.cmdLine.value = `contact`;
+      this.handleCmd();
+    };
 
     const socialButtons = document.createElement("div");
     socialButtons.setAttribute("class", "social-buttons");
@@ -540,6 +544,9 @@ var main = (function () {
     var cmdComponents = this.cmdLine.value.trim().split(" ");
     this.lock();
     switch (cmdComponents[0]) {
+      case "contact":
+        this.cat(["contact"]);
+        break;
       case cmds.CAT.value:
         this.cat(cmdComponents);
         break;
@@ -603,6 +610,13 @@ var main = (function () {
         cmdComponents[1] === configs.getInstance().welcome_file_name
           ? configs.getInstance().welcome
           : files.getInstance()[cmdComponents[1]];
+    }
+    if (cmdComponents[0] === "contact") {
+      this.type(
+        `If you'd like to reach out, send an email to ${contact}`,
+        this.unlock.bind(this)
+      );
+      return;
     }
     if (isApiCall(result)) {
       getApiCall(result).then((data) => {
