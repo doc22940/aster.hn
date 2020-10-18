@@ -35,7 +35,7 @@ var configs = (function () {
     sudo_help: "Execute a command as the superuser.",
     welcome: [
       `Well... aren't you just a curious bean?`,
-      "I bet you thought you would find a website here...",
+      "I bet you thought you'd find a website here...",
       "And perhaps you have.",
     ].join("\n"),
     internet_explorer_warning:
@@ -80,31 +80,38 @@ var files = (function () {
     }
   };
   Singleton.defaultOptions = {
-    "about.txt": [
-      "A curious and passionate engineer, Aster pours her heart into everything she builds.",
-      "Adept at front-end work, as well as the underlying infrastructure,",
-      "Aster makes sure applications get done fast, and are maintainable, secure, and scalable.",
-      "8+ years of professional experience, 4+ of independent volunteer work.",
-    ].join("\n"),
     "getting_started.txt": [
-      "First time in a terminal? No worries, there's a first for everything.",
-      "Navigation is pretty straight-forward, you can either use linux terminal",
+      "First time in a terminal? No worries, there's a first time for everything.",
+      "Navigation is pretty straight-forward, you can use linux terminal",
       "commands like 'ls' or 'cat' to see what's available and read contents of files.",
       "'help' will print out the list of possible commands you can use.",
       "Alternatively, you can use the sidebar to the left to select from the available",
       "files, and it will output their contents here in the console.",
     ].join("\n"),
+    "about.txt": `query {
+      personalInfos {
+        About
+      }
+    }`,
     "experience.txt": `query {
       employments {
         Company
         Title
         fromDate
+        toDate
+        current
         projects
       }
     }`,
-    "contact.txt": "inquiries@aster.hn",
-    "linkedin_profile.txt": "https://linkedin.com/in/therebelrobot",
-    "github_profile.txt": "https://github.com/therebelrobot",
+    "volunteer.txt": `query {
+      volunteers {
+        Organization
+        Role
+        fromDate
+        toDate
+        projects
+      }
+    }`,
     "attribution.txt": [
       "This site was adapted from Luís Bragança's amazing fake-terminal-website project",
       "(github.com/luisbraganca/fake-terminal-website).",
@@ -120,6 +127,10 @@ var files = (function () {
   };
 })();
 
+let github = "";
+let linkedin = "";
+let contact = "";
+
 const getApiCall = (query) => {
   return axios({
     url: "https://api.aster.hn/graphql",
@@ -133,15 +144,51 @@ const getApiCall = (query) => {
   });
 };
 
+getApiCall(`query {
+  personalInfos {
+    github
+    linkedin
+    contact
+  }
+}`).then((data) => {
+  github = data.data.personalInfos[0].github;
+  linkedin = data.data.personalInfos[0].linkedin;
+  contact = data.data.personalInfos[0].contact;
+});
+
+const trucateDate = (dateStr) => {
+  const [year, month] = dateStr.split("-");
+  return `${year}-${month}`;
+};
+
 const format = {
   employments: (data) => {
     return `${data.employments
+      .reverse()
       .map((employ) => {
         return `
         ${employ.Company} - ${employ.Title}
-      ${employ.fromDate} - ...
+      ${trucateDate(employ.fromDate)} - ${
+          employ.current ? "Current Position" : trucateDate(employ.toDate)
+        }
 
       ${employ.projects}
+      `;
+      })
+      .join("\n=========\n")}`;
+  },
+  about: (data) => {
+    return `${data.personalInfos[0].About}`;
+  },
+  volunteers: (data) => {
+    return `${data.volunteers
+      .reverse()
+      .map((v) => {
+        return `
+        ${v.Organization} - ${v.Role}
+      ${trucateDate(v.fromDate)} - ${trucateDate(v.toDate)}
+
+      ${v.projects}
       `;
       })
       .join("\n=========\n")}`;
@@ -334,6 +381,7 @@ var main = (function () {
     })();
     for (var file in files.getInstance()) {
       var element = document.createElement("button");
+      element.setAttribute("data-type", file);
       Terminal.makeElementDisappear(element);
       element.onclick = function (file, event) {
         this.handleSidenav(event);
@@ -342,12 +390,52 @@ var main = (function () {
       }.bind(this, file);
       element.appendChild(
         document.createTextNode(
-          capFirst(file.replace(/\.[^/.]+$/, "").replace(/_/g, " "))
+          file.replace(/\.[^/.]+$/, "").replace(/_/g, " ")
         )
       );
       this.sidenav.appendChild(element);
       this.sidenavElements.push(element);
     }
+
+    // build contact buttons
+    const githubButton = document.createElement("i");
+    githubButton.setAttribute("data-feather", "github");
+    Terminal.makeElementDisappear(githubButton);
+    element.onclick = (file, event) => {
+      window.open(`https://github.com/${github}`);
+    };
+    const githubMenuButton = document.createElement("button");
+    githubMenuButton.appendChild(githubButton);
+    const linkedinButton = document.createElement("i");
+    linkedinButton.setAttribute("data-feather", "linkedin");
+    Terminal.makeElementDisappear(linkedinButton);
+    element.onclick = (file, event) => {
+      window.open(`https://linkedin.com/in/${linkedin}`);
+    };
+    const linkedinMenuButton = document.createElement("button");
+    linkedinMenuButton.appendChild(linkedinButton);
+    const mailButton = document.createElement("i");
+    mailButton.setAttribute("data-feather", "mail");
+    Terminal.makeElementDisappear(mailButton);
+    element.onclick = (file, event) => {
+      this.handleSidenav(event);
+      this.cmdLine.value = `To reach out, feel free to send an email to ${contact}`;
+      this.handleCmd();
+    };
+    const mailMenuButton = document.createElement("button");
+    mailMenuButton.appendChild(mailButton);
+
+    const socialButtons = document.createElement("div");
+    socialButtons.setAttribute("class", "social-buttons");
+    socialButtons.appendChild(linkedinMenuButton);
+    socialButtons.appendChild(githubMenuButton);
+    socialButtons.appendChild(mailMenuButton);
+
+    this.sidenav.appendChild(socialButtons);
+    this.sidenavElements.push(socialButtons);
+
+    feather.replace();
+
     // Shouldn't use document.getElementById but Terminal is already using loads of params
     document
       .getElementById("sidenavBtn")
@@ -358,12 +446,18 @@ var main = (function () {
     if (this.sidenavOpen) {
       this.profilePic.style.opacity = 0;
       this.sidenavElements.forEach(Terminal.makeElementDisappear);
+      document
+        .querySelectorAll("svg.feather")
+        .forEach(Terminal.makeElementDisappear);
       this.sidenav.style.width = "50px";
       document.getElementById("sidenavBtn").innerHTML = "&#9776;";
       this.sidenavOpen = false;
     } else {
       this.sidenav.style.width = "300px";
       this.sidenavElements.forEach(Terminal.makeElementAppear);
+      document
+        .querySelectorAll("svg.feather")
+        .forEach(Terminal.makeElementAppear);
       document.getElementById("sidenavBtn").innerHTML = "&times;";
       this.profilePic.style.opacity = 1;
       this.sidenavOpen = true;
@@ -511,14 +605,19 @@ var main = (function () {
           : files.getInstance()[cmdComponents[1]];
     }
     if (isApiCall(result)) {
-      console.log("isApiCall!");
       getApiCall(result).then((data) => {
         let results = "";
-        console.log("checking", data);
+        console.log(data);
+        if (data.data.personalInfos) {
+          if (data.data.personalInfos[0].About) {
+            results += format.about(data.data);
+          }
+        }
+        if (data.data.volunteers) {
+          results += format.volunteers(data.data);
+        }
         if (data.data.employments) {
-          console.log("should");
           results += format.employments(data.data);
-          console.log(results);
         }
         this.type(results, this.unlock.bind(this));
       });
