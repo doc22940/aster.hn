@@ -1,0 +1,825 @@
+directive @cacheControl(maxAge: Int, scope: CacheControlScope) on FIELD_DEFINITION | OBJECT | INTERFACE
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+input createEmploymentInput {
+  data: EmploymentInput
+}
+
+type createEmploymentPayload {
+  employment: Employment
+}
+
+input createPersonalInfoInput {
+  data: PersonalInfoInput
+}
+
+type createPersonalInfoPayload {
+  personalInfo: PersonalInfo
+}
+
+input createRoleInput {
+  data: RoleInput
+}
+
+type createRolePayload {
+  role: UsersPermissionsRole
+}
+
+input createUserInput {
+  data: UserInput
+}
+
+type createUserPayload {
+  user: UsersPermissionsUser
+}
+
+"""
+A date string, such as 2007-12-03, compliant with the `full-date` format
+outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for
+representation of dates and times using the Gregorian calendar.
+"""
+scalar Date
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the
+`date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO
+8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+input deleteEmploymentInput {
+  where: InputID
+}
+
+type deleteEmploymentPayload {
+  employment: Employment
+}
+
+input deletePersonalInfoInput {
+  where: InputID
+}
+
+type deletePersonalInfoPayload {
+  personalInfo: PersonalInfo
+}
+
+input deleteRoleInput {
+  where: InputID
+}
+
+type deleteRolePayload {
+  role: UsersPermissionsRole
+}
+
+input deleteUserInput {
+  where: InputID
+}
+
+type deleteUserPayload {
+  user: UsersPermissionsUser
+}
+
+input editEmploymentInput {
+  Company: String
+  Title: String
+  fromDate: Date
+  toDate: Date
+  projects: String
+}
+
+input editFileInput {
+  name: String
+  hash: String
+  sha256: String
+  ext: String
+  mime: String
+  size: Float
+  url: String
+  provider: String
+  provider_metadata: JSON
+  related: [ID]
+}
+
+input editPersonalInfoInput {
+  name: String
+  Title: String
+}
+
+input editRoleInput {
+  name: String
+  description: String
+  type: String
+  permissions: [ID]
+  users: [ID]
+}
+
+input editUserInput {
+  username: String
+  email: String
+  provider: String
+  password: String
+  resetPasswordToken: String
+  confirmed: Boolean
+  blocked: Boolean
+  role: ID
+}
+
+type Employment {
+  Company: String
+  Title: String
+  fromDate: Date
+  toDate: Date
+  projects: String
+  _id: ID!
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type EmploymentAggregator {
+  count: Int
+  totalCount: Int
+}
+
+type EmploymentConnection {
+  values: [Employment]
+  groupBy: EmploymentGroupBy
+  aggregate: EmploymentAggregator
+}
+
+type EmploymentConnection_id {
+  key: ID
+  connection: EmploymentConnection
+}
+
+type EmploymentConnectionCompany {
+  key: String
+  connection: EmploymentConnection
+}
+
+type EmploymentConnectionCreatedAt {
+  key: DateTime
+  connection: EmploymentConnection
+}
+
+type EmploymentConnectionFromDate {
+  key: ID
+  connection: EmploymentConnection
+}
+
+type EmploymentConnectionId {
+  key: ID
+  connection: EmploymentConnection
+}
+
+type EmploymentConnectionProjects {
+  key: String
+  connection: EmploymentConnection
+}
+
+type EmploymentConnectionTitle {
+  key: String
+  connection: EmploymentConnection
+}
+
+type EmploymentConnectionToDate {
+  key: ID
+  connection: EmploymentConnection
+}
+
+type EmploymentConnectionUpdatedAt {
+  key: DateTime
+  connection: EmploymentConnection
+}
+
+type EmploymentGroupBy {
+  Company: [EmploymentConnectionCompany]
+  Title: [EmploymentConnectionTitle]
+  fromDate: [EmploymentConnectionFromDate]
+  toDate: [EmploymentConnectionToDate]
+  projects: [EmploymentConnectionProjects]
+  _id: [EmploymentConnection_id]
+  id: [EmploymentConnectionId]
+  createdAt: [EmploymentConnectionCreatedAt]
+  updatedAt: [EmploymentConnectionUpdatedAt]
+}
+
+input EmploymentInput {
+  Company: String
+  Title: String
+  fromDate: Date
+  toDate: Date
+  projects: String
+}
+
+input FileInput {
+  name: String!
+  hash: String!
+  sha256: String
+  ext: String
+  mime: String!
+  size: Float!
+  url: String!
+  provider: String!
+  provider_metadata: JSON
+  related: [ID]
+}
+
+input InputID {
+  id: ID!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+The `Long` scalar type represents 52-bit integers
+"""
+scalar Long
+
+union Morph =
+    UsersPermissionsMe
+  | UsersPermissionsMeRole
+  | UsersPermissionsLoginPayload
+  | Employment
+  | createEmploymentPayload
+  | updateEmploymentPayload
+  | deleteEmploymentPayload
+  | EmploymentConnection
+  | EmploymentAggregator
+  | EmploymentGroupBy
+  | EmploymentConnectionCompany
+  | EmploymentConnectionTitle
+  | EmploymentConnectionFromDate
+  | EmploymentConnectionToDate
+  | EmploymentConnectionProjects
+  | EmploymentConnection_id
+  | EmploymentConnectionId
+  | EmploymentConnectionCreatedAt
+  | EmploymentConnectionUpdatedAt
+  | PersonalInfo
+  | createPersonalInfoPayload
+  | updatePersonalInfoPayload
+  | deletePersonalInfoPayload
+  | PersonalInfoConnection
+  | PersonalInfoAggregator
+  | PersonalInfoGroupBy
+  | PersonalInfoConnectionName
+  | PersonalInfoConnectionTitle
+  | PersonalInfoConnection_id
+  | PersonalInfoConnectionId
+  | PersonalInfoConnectionCreatedAt
+  | PersonalInfoConnectionUpdatedAt
+  | UploadFile
+  | UploadFileConnection
+  | UploadFileAggregator
+  | UploadFileGroupBy
+  | UploadFileConnectionName
+  | UploadFileConnectionHash
+  | UploadFileConnectionSha256
+  | UploadFileConnectionExt
+  | UploadFileConnectionMime
+  | UploadFileConnectionSize
+  | UploadFileConnectionUrl
+  | UploadFileConnectionProvider
+  | UploadFileConnectionProvider_metadata
+  | UploadFileConnection_id
+  | UploadFileConnectionId
+  | UploadFileConnectionCreatedAt
+  | UploadFileConnectionUpdatedAt
+  | UsersPermissionsPermission
+  | UsersPermissionsRole
+  | createRolePayload
+  | updateRolePayload
+  | deleteRolePayload
+  | UsersPermissionsRoleConnection
+  | UsersPermissionsRoleAggregator
+  | UsersPermissionsRoleGroupBy
+  | UsersPermissionsRoleConnectionName
+  | UsersPermissionsRoleConnectionDescription
+  | UsersPermissionsRoleConnectionType
+  | UsersPermissionsRoleConnection_id
+  | UsersPermissionsRoleConnectionId
+  | UsersPermissionsRoleConnectionCreatedAt
+  | UsersPermissionsRoleConnectionUpdatedAt
+  | UsersPermissionsUser
+  | createUserPayload
+  | updateUserPayload
+  | deleteUserPayload
+  | UsersPermissionsUserConnection
+  | UsersPermissionsUserAggregator
+  | UsersPermissionsUserGroupBy
+  | UsersPermissionsUserConnectionUsername
+  | UsersPermissionsUserConnectionEmail
+  | UsersPermissionsUserConnectionProvider
+  | UsersPermissionsUserConnectionConfirmed
+  | UsersPermissionsUserConnectionBlocked
+  | UsersPermissionsUserConnectionRole
+  | UsersPermissionsUserConnection_id
+  | UsersPermissionsUserConnectionId
+  | UsersPermissionsUserConnectionCreatedAt
+  | UsersPermissionsUserConnectionUpdatedAt
+
+type Mutation {
+  createEmployment(input: createEmploymentInput): createEmploymentPayload
+  updateEmployment(input: updateEmploymentInput): updateEmploymentPayload
+  deleteEmployment(input: deleteEmploymentInput): deleteEmploymentPayload
+  createPersonalInfo(input: createPersonalInfoInput): createPersonalInfoPayload
+  updatePersonalInfo(input: updatePersonalInfoInput): updatePersonalInfoPayload
+  deletePersonalInfo(input: deletePersonalInfoInput): deletePersonalInfoPayload
+
+  """
+  Create a new role
+  """
+  createRole(input: createRoleInput): createRolePayload
+
+  """
+  Update an existing role
+  """
+  updateRole(input: updateRoleInput): updateRolePayload
+
+  """
+  Delete an existing role
+  """
+  deleteRole(input: deleteRoleInput): deleteRolePayload
+
+  """
+  Create a new user
+  """
+  createUser(input: createUserInput): createUserPayload
+
+  """
+  Update an existing user
+  """
+  updateUser(input: updateUserInput): updateUserPayload
+
+  """
+  Delete an existing user
+  """
+  deleteUser(input: deleteUserInput): deleteUserPayload
+  upload(refId: ID, ref: String, field: String, source: String, file: Upload!): UploadFile!
+  multipleUpload(refId: ID, ref: String, field: String, source: String, files: [Upload]!): [UploadFile]!
+  login(input: UsersPermissionsLoginInput!): UsersPermissionsLoginPayload!
+  register(input: UserInput!): UsersPermissionsLoginPayload!
+}
+
+type PersonalInfo {
+  name: String
+  Title: String
+  _id: ID!
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PersonalInfoAggregator {
+  count: Int
+  totalCount: Int
+}
+
+type PersonalInfoConnection {
+  values: [PersonalInfo]
+  groupBy: PersonalInfoGroupBy
+  aggregate: PersonalInfoAggregator
+}
+
+type PersonalInfoConnection_id {
+  key: ID
+  connection: PersonalInfoConnection
+}
+
+type PersonalInfoConnectionCreatedAt {
+  key: DateTime
+  connection: PersonalInfoConnection
+}
+
+type PersonalInfoConnectionId {
+  key: ID
+  connection: PersonalInfoConnection
+}
+
+type PersonalInfoConnectionName {
+  key: String
+  connection: PersonalInfoConnection
+}
+
+type PersonalInfoConnectionTitle {
+  key: String
+  connection: PersonalInfoConnection
+}
+
+type PersonalInfoConnectionUpdatedAt {
+  key: DateTime
+  connection: PersonalInfoConnection
+}
+
+type PersonalInfoGroupBy {
+  name: [PersonalInfoConnectionName]
+  Title: [PersonalInfoConnectionTitle]
+  _id: [PersonalInfoConnection_id]
+  id: [PersonalInfoConnectionId]
+  createdAt: [PersonalInfoConnectionCreatedAt]
+  updatedAt: [PersonalInfoConnectionUpdatedAt]
+}
+
+input PersonalInfoInput {
+  name: String
+  Title: String
+}
+
+type Query {
+  employment(id: ID!): Employment
+  employments(sort: String, limit: Int, start: Int, where: JSON): [Employment]
+  employmentsConnection(sort: String, limit: Int, start: Int, where: JSON): EmploymentConnection
+  personalInfo(id: ID!): PersonalInfo
+  personalInfos(sort: String, limit: Int, start: Int, where: JSON): [PersonalInfo]
+  personalInfosConnection(sort: String, limit: Int, start: Int, where: JSON): PersonalInfoConnection
+  files(sort: String, limit: Int, start: Int, where: JSON): [UploadFile]
+  filesConnection(sort: String, limit: Int, start: Int, where: JSON): UploadFileConnection
+  role(id: ID!): UsersPermissionsRole
+
+  """
+  Retrieve all the existing roles. You can't apply filters on this query.
+  """
+  roles(sort: String, limit: Int, start: Int, where: JSON): [UsersPermissionsRole]
+  rolesConnection(sort: String, limit: Int, start: Int, where: JSON): UsersPermissionsRoleConnection
+  user(id: ID!): UsersPermissionsUser
+  users(sort: String, limit: Int, start: Int, where: JSON): [UsersPermissionsUser]
+  usersConnection(sort: String, limit: Int, start: Int, where: JSON): UsersPermissionsUserConnection
+  me: UsersPermissionsMe
+}
+
+input RoleInput {
+  name: String!
+  description: String
+  type: String
+  permissions: [ID]
+  users: [ID]
+}
+
+"""
+A time string with format: HH:mm:ss.SSS
+"""
+scalar Time
+
+input updateEmploymentInput {
+  where: InputID
+  data: editEmploymentInput
+}
+
+type updateEmploymentPayload {
+  employment: Employment
+}
+
+input updatePersonalInfoInput {
+  where: InputID
+  data: editPersonalInfoInput
+}
+
+type updatePersonalInfoPayload {
+  personalInfo: PersonalInfo
+}
+
+input updateRoleInput {
+  where: InputID
+  data: editRoleInput
+}
+
+type updateRolePayload {
+  role: UsersPermissionsRole
+}
+
+input updateUserInput {
+  where: InputID
+  data: editUserInput
+}
+
+type updateUserPayload {
+  user: UsersPermissionsUser
+}
+
+"""
+The `Upload` scalar type represents a file upload.
+"""
+scalar Upload
+
+type UploadFile {
+  name: String!
+  hash: String!
+  sha256: String
+  ext: String
+  mime: String!
+  size: Float!
+  url: String!
+  provider: String!
+  provider_metadata: JSON
+  related(sort: String, limit: Int, start: Int, where: JSON): [Morph]
+  _id: ID!
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UploadFileAggregator {
+  count: Int
+  totalCount: Int
+}
+
+type UploadFileConnection {
+  values: [UploadFile]
+  groupBy: UploadFileGroupBy
+  aggregate: UploadFileAggregator
+}
+
+type UploadFileConnection_id {
+  key: ID
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionCreatedAt {
+  key: DateTime
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionExt {
+  key: String
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionHash {
+  key: String
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionId {
+  key: ID
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionMime {
+  key: String
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionName {
+  key: String
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionProvider {
+  key: String
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionProvider_metadata {
+  key: JSON
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionSha256 {
+  key: String
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionSize {
+  key: Float
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionUpdatedAt {
+  key: DateTime
+  connection: UploadFileConnection
+}
+
+type UploadFileConnectionUrl {
+  key: String
+  connection: UploadFileConnection
+}
+
+type UploadFileGroupBy {
+  name: [UploadFileConnectionName]
+  hash: [UploadFileConnectionHash]
+  sha256: [UploadFileConnectionSha256]
+  ext: [UploadFileConnectionExt]
+  mime: [UploadFileConnectionMime]
+  size: [UploadFileConnectionSize]
+  url: [UploadFileConnectionUrl]
+  provider: [UploadFileConnectionProvider]
+  provider_metadata: [UploadFileConnectionProvider_metadata]
+  _id: [UploadFileConnection_id]
+  id: [UploadFileConnectionId]
+  createdAt: [UploadFileConnectionCreatedAt]
+  updatedAt: [UploadFileConnectionUpdatedAt]
+}
+
+input UserInput {
+  username: String!
+  email: String!
+  provider: String
+  password: String
+  resetPasswordToken: String
+  confirmed: Boolean
+  blocked: Boolean
+  role: ID
+}
+
+input UsersPermissionsLoginInput {
+  identifier: String!
+  password: String!
+  provider: String = "local"
+}
+
+type UsersPermissionsLoginPayload {
+  jwt: String!
+  user: UsersPermissionsMe!
+}
+
+type UsersPermissionsMe {
+  id: ID!
+  username: String!
+  email: String!
+  confirmed: Boolean
+  blocked: Boolean
+  role: UsersPermissionsMeRole
+}
+
+type UsersPermissionsMeRole {
+  id: ID!
+  name: String!
+  description: String
+  type: String
+}
+
+type UsersPermissionsPermission {
+  type: String!
+  controller: String!
+  action: String!
+  enabled: Boolean!
+  policy: String
+  role: UsersPermissionsRole
+  _id: ID!
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UsersPermissionsRole {
+  name: String!
+  description: String
+  type: String
+  permissions(sort: String, limit: Int, start: Int, where: JSON): [UsersPermissionsPermission]
+  users(sort: String, limit: Int, start: Int, where: JSON): [UsersPermissionsUser]
+  _id: ID!
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UsersPermissionsRoleAggregator {
+  count: Int
+  totalCount: Int
+}
+
+type UsersPermissionsRoleConnection {
+  values: [UsersPermissionsRole]
+  groupBy: UsersPermissionsRoleGroupBy
+  aggregate: UsersPermissionsRoleAggregator
+}
+
+type UsersPermissionsRoleConnection_id {
+  key: ID
+  connection: UsersPermissionsRoleConnection
+}
+
+type UsersPermissionsRoleConnectionCreatedAt {
+  key: DateTime
+  connection: UsersPermissionsRoleConnection
+}
+
+type UsersPermissionsRoleConnectionDescription {
+  key: String
+  connection: UsersPermissionsRoleConnection
+}
+
+type UsersPermissionsRoleConnectionId {
+  key: ID
+  connection: UsersPermissionsRoleConnection
+}
+
+type UsersPermissionsRoleConnectionName {
+  key: String
+  connection: UsersPermissionsRoleConnection
+}
+
+type UsersPermissionsRoleConnectionType {
+  key: String
+  connection: UsersPermissionsRoleConnection
+}
+
+type UsersPermissionsRoleConnectionUpdatedAt {
+  key: DateTime
+  connection: UsersPermissionsRoleConnection
+}
+
+type UsersPermissionsRoleGroupBy {
+  name: [UsersPermissionsRoleConnectionName]
+  description: [UsersPermissionsRoleConnectionDescription]
+  type: [UsersPermissionsRoleConnectionType]
+  _id: [UsersPermissionsRoleConnection_id]
+  id: [UsersPermissionsRoleConnectionId]
+  createdAt: [UsersPermissionsRoleConnectionCreatedAt]
+  updatedAt: [UsersPermissionsRoleConnectionUpdatedAt]
+}
+
+type UsersPermissionsUser {
+  username: String!
+  email: String!
+  provider: String
+  confirmed: Boolean
+  blocked: Boolean
+  role: UsersPermissionsRole
+  _id: ID!
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UsersPermissionsUserAggregator {
+  count: Int
+  totalCount: Int
+}
+
+type UsersPermissionsUserConnection {
+  values: [UsersPermissionsUser]
+  groupBy: UsersPermissionsUserGroupBy
+  aggregate: UsersPermissionsUserAggregator
+}
+
+type UsersPermissionsUserConnection_id {
+  key: ID
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionBlocked {
+  key: Boolean
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionConfirmed {
+  key: Boolean
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionCreatedAt {
+  key: DateTime
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionEmail {
+  key: String
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionId {
+  key: ID
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionProvider {
+  key: String
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionRole {
+  key: ID
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionUpdatedAt {
+  key: DateTime
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserConnectionUsername {
+  key: String
+  connection: UsersPermissionsUserConnection
+}
+
+type UsersPermissionsUserGroupBy {
+  username: [UsersPermissionsUserConnectionUsername]
+  email: [UsersPermissionsUserConnectionEmail]
+  provider: [UsersPermissionsUserConnectionProvider]
+  confirmed: [UsersPermissionsUserConnectionConfirmed]
+  blocked: [UsersPermissionsUserConnectionBlocked]
+  role: [UsersPermissionsUserConnectionRole]
+  _id: [UsersPermissionsUserConnection_id]
+  id: [UsersPermissionsUserConnectionId]
+  createdAt: [UsersPermissionsUserConnectionCreatedAt]
+  updatedAt: [UsersPermissionsUserConnectionUpdatedAt]
+}

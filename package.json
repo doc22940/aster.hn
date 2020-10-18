@@ -1,0 +1,15 @@
+{
+  "name": "aster.hn",
+  "version": "1.0.0",
+  "description": "for all the things",
+  "main": "index.html",
+  "repository": "ssh://git@github.com/therebelrobot/aster.hn.git",
+  "author": "therebelrobot <github@therebelrobot.com>",
+  "license": "MIT",
+  "dependencies": {
+    "serve": "^11.3.2"
+  },
+  "scripts": {
+    "start": "serve"
+  }
+}
